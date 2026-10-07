@@ -1,0 +1,12 @@
+# Backend
+target/
+build/
+.gradle/
+*.class
+.idea/
+*.iml
+
+# Frontend
+node_modules/
+dist/
+.angular/

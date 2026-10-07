@@ -1,0 +1,305 @@
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">+</span><span>OPD<span class="brand-muted"> / care desk</span></span>
+    </div>
+    <div class="sidebar-intro">
+      <span class="eyebrow">CLINIC CONSOLE</span>
+      <h1>Good morning.</h1>
+      <p>Keep today’s patient flow moving.</p>
+    </div>
+    <nav aria-label="Main navigation">
+      <button [class.active]="activeView() === 'patients'" (click)="setView('patients')">
+        <span>01</span> Patients
+      </button>
+      <button [class.active]="activeView() === 'appointments'" (click)="setView('appointments')">
+        <span>02</span> Appointments
+      </button>
+      <button [class.active]="activeView() === 'consultations'" (click)="setView('consultations')">
+        <span>03</span> Consultations
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <span class="status-dot"></span><span>Local workspace</span
+      ><small>API ready to connect</small>
+    </div>
+  </aside>
+  <main class="workspace">
+    <header class="topbar">
+      <div>
+        <span class="eyebrow">OUTPATIENT DEPARTMENT</span>
+        <p class="date-label">{{ todayAppointments().length }} appointments scheduled for today</p>
+      </div>
+      <div class="avatar">FD</div>
+    </header>
+    @if (activeView() === 'patients') {
+      <section class="view-head">
+        <div>
+          <span class="eyebrow">PATIENTS / 01</span>
+          <h2>Patient register</h2>
+          <p>Add new patients and find existing records in seconds.</p>
+        </div>
+        <span class="count-badge">{{ patients().length }} registered</span>
+      </section>
+      <div class="grid-layout">
+        <section class="panel form-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="step">A</span>
+              <h3>Register patient</h3>
+            </div>
+            <span class="muted">Basic details</span>
+          </div>
+          <form (ngSubmit)="addPatient()">
+            <label
+              >Full name<input
+                name="name"
+                [(ngModel)]="patientForm.name"
+                placeholder="e.g. Riya Sharma"
+                required
+            /></label>
+            <div class="form-row">
+              <label
+                >Gender<select name="gender" [(ngModel)]="patientForm.gender" required>
+                  <option value="">Select</option>
+                  <option>Female</option>
+                  <option>Male</option>
+                  <option>Other</option>
+                </select></label
+              ><label
+                >Age<input
+                  name="age"
+                  type="number"
+                  min="0"
+                  [(ngModel)]="patientForm.age"
+                  placeholder="Years"
+                  required
+              /></label>
+            </div>
+            <label
+              >Phone number<input
+                name="phone"
+                type="tel"
+                [(ngModel)]="patientForm.phone"
+                placeholder="10-digit phone number"
+                required /></label
+            ><button class="primary-button" type="submit">Register patient <span>↗</span></button>
+          </form>
+        </section>
+        <section class="panel list-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="step">B</span>
+              <h3>Patient directory</h3>
+            </div>
+            <input
+              class="search"
+              [ngModel]="patientSearch()"
+              (ngModelChange)="patientSearch.set($event)"
+              placeholder="Search name or phone"
+              aria-label="Search patients"
+            />
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Gender</th>
+                  <th>Age</th>
+                  <th>Phone</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (patient of filteredPatients(); track patient.id) {
+                  <tr>
+                    <td>
+                      <strong>{{ patient.name }}</strong
+                      ><small>PT-{{ patient.id.toString().padStart(4, '0') }}</small>
+                    </td>
+                    <td>{{ patient.gender }}</td>
+                    <td>{{ patient.age }}</td>
+                    <td>{{ patient.phone }}</td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="4" class="empty">No patients match your search.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    }
+    @if (activeView() === 'appointments') {
+      <section class="view-head">
+        <div>
+          <span class="eyebrow">APPOINTMENTS / 02</span>
+          <h2>Appointment desk</h2>
+          <p>Book the next visit and keep today’s queue visible.</p>
+        </div>
+        <span class="count-badge">{{ todayAppointments().length }} today</span>
+      </section>
+      <div class="grid-layout">
+        <section class="panel form-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="step">A</span>
+              <h3>Book appointment</h3>
+            </div>
+            <span class="muted">New visit</span>
+          </div>
+          <form (ngSubmit)="bookAppointment()">
+            <label
+              >Patient<select name="patientId" [(ngModel)]="appointmentForm.patientId" required>
+                <option [ngValue]="null">Select patient</option>
+                @for (patient of patients(); track patient.id) {
+                  <option [ngValue]="patient.id">{{ patient.name }}</option>
+                }
+              </select></label
+            ><label
+              >Doctor<input
+                name="doctor"
+                [(ngModel)]="appointmentForm.doctor"
+                placeholder="e.g. Dr. Priya Mehta"
+                required
+            /></label>
+            <div class="form-row">
+              <label
+                >Date<input
+                  name="date"
+                  type="date"
+                  [(ngModel)]="appointmentForm.date"
+                  required /></label
+              ><label
+                >Time<input name="time" type="time" [(ngModel)]="appointmentForm.time" required
+              /></label>
+            </div>
+            <button class="primary-button" type="submit">Book appointment <span>↗</span></button>
+          </form>
+        </section>
+        <section class="panel list-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="step">B</span>
+              <h3>Today’s queue</h3>
+            </div>
+            <span class="muted">{{ todayAppointments().length }} visits</span>
+          </div>
+          <div class="appointment-list">
+            @for (appointment of todayAppointments(); track appointment.id) {
+              <article class="appointment">
+                <div class="time">{{ appointment.time }}</div>
+                <div>
+                  <strong>{{ appointment.patientName }}</strong>
+                  <p>{{ appointment.doctor }}</p>
+                </div>
+                <span class="tag" [class.complete]="appointment.status === 'Completed'">{{
+                  appointment.status
+                }}</span>
+              </article>
+            } @empty {
+              <p class="empty">No appointments scheduled for today.</p>
+            }
+          </div>
+        </section>
+      </div>
+    }
+    @if (activeView() === 'consultations') {
+      <section class="view-head">
+        <div>
+          <span class="eyebrow">CONSULTATIONS / 03</span>
+          <h2>Consultation summary</h2>
+          <p>Record vitals and close the loop on a patient visit.</p>
+        </div>
+        <span class="count-badge">{{ consultations().length }} completed</span>
+      </section>
+      <div class="grid-layout">
+        <section class="panel form-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="step">A</span>
+              <h3>Complete consultation</h3>
+            </div>
+            <span class="muted">Doctor notes</span>
+          </div>
+          <form (ngSubmit)="completeConsultation()">
+            <label
+              >Appointment<select
+                name="appointmentId"
+                [(ngModel)]="consultationForm.appointmentId"
+                required
+              >
+                <option [ngValue]="null">Select appointment</option>
+                @for (appointment of appointments(); track appointment.id) {
+                  @if (appointment.status === 'Scheduled') {
+                    <option [ngValue]="appointment.id">
+                      {{ appointment.patientName }} · {{ appointment.time }}
+                    </option>
+                  }
+                }
+              </select></label
+            >
+            <div class="form-row">
+              <label
+                >Pulse<input
+                  name="pulse"
+                  [(ngModel)]="consultationForm.pulse"
+                  placeholder="e.g. 72 bpm"
+                  required /></label
+              ><label
+                >Temperature<input
+                  name="temperature"
+                  [(ngModel)]="consultationForm.temperature"
+                  placeholder="e.g. 98.6 °F"
+                  required
+              /></label>
+            </div>
+            <label
+              >Short notes<textarea
+                name="notes"
+                [(ngModel)]="consultationForm.notes"
+                rows="5"
+                placeholder="Record observations and advice..."
+                required
+              ></textarea></label
+            ><button class="primary-button" type="submit">Mark complete <span>↗</span></button>
+          </form>
+        </section>
+        <section class="panel list-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="step">B</span>
+              <h3>Completed consultations</h3>
+            </div>
+          </div>
+          <div class="consultation-list">
+            @for (consultation of consultations(); track consultation.id) {
+              <article class="consultation">
+                <div class="consultation-top">
+                  <strong>{{ consultation.patientName }}</strong
+                  ><span>{{ consultation.date }}</span>
+                </div>
+                <p>{{ consultation.doctor }}</p>
+                <div class="vitals">
+                  <span
+                    >Pulse <b>{{ consultation.pulse }}</b></span
+                  ><span
+                    >Temp <b>{{ consultation.temperature }}</b></span
+                  >
+                </div>
+                <blockquote>{{ consultation.notes }}</blockquote>
+              </article>
+            } @empty {
+              <div class="empty empty-state">
+                <span>◌</span>
+                <p>Completed visits will appear here.</p>
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+    }
+  </main>
+</div>
