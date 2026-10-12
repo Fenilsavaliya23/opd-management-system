@@ -1,0 +1,13 @@
+1. doctor same as patients, with time limit,
+2. add dropdown menu into appointment
+3. write the unit testes.
+4. appointments time limit should not over from doctor time limit.
+
+
+solid principle,
+junit, 
+multi threading
+asynchronous function in springboot
+design pattern.
+top 10 application security contexts
+vulnerability and how to prevent this.

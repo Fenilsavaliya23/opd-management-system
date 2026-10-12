@@ -41,6 +41,9 @@
         </div>
         <span class="count-badge">{{ patients().length }} registered</span>
       </section>
+      @if (patientError()) {
+        <p class="error-message" role="alert">{{ patientError() }}</p>
+      }
       <div class="grid-layout">
         <section class="panel form-panel">
           <div class="panel-heading">
@@ -83,7 +86,9 @@
                 [(ngModel)]="patientForm.phone"
                 placeholder="10-digit phone number"
                 required /></label
-            ><button class="primary-button" type="submit">Register patient <span>↗</span></button>
+            ><button class="primary-button" type="submit" [disabled]="patientsLoading()">
+              {{ patientsLoading() ? 'Saving...' : 'Register patient' }} <span>↗</span>
+            </button>
           </form>
         </section>
         <section class="panel list-panel">
@@ -141,6 +146,9 @@
         </div>
         <span class="count-badge">{{ todayAppointments().length }} today</span>
       </section>
+      @if (appointmentError()) {
+        <p class="error-message" role="alert">{{ appointmentError() }}</p>
+      }
       <div class="grid-layout">
         <section class="panel form-panel">
           <div class="panel-heading">
@@ -176,7 +184,9 @@
                 >Time<input name="time" type="time" [(ngModel)]="appointmentForm.time" required
               /></label>
             </div>
-            <button class="primary-button" type="submit">Book appointment <span>↗</span></button>
+            <button class="primary-button" type="submit" [disabled]="appointmentsLoading()">
+              {{ appointmentsLoading() ? 'Saving...' : 'Book appointment' }} <span>↗</span>
+            </button>
           </form>
         </section>
         <section class="panel list-panel">
@@ -215,6 +225,9 @@
         </div>
         <span class="count-badge">{{ consultations().length }} completed</span>
       </section>
+      @if (consultationError()) {
+        <p class="error-message" role="alert">{{ consultationError() }}</p>
+      }
       <div class="grid-layout">
         <section class="panel form-panel">
           <div class="panel-heading">
@@ -264,7 +277,9 @@
                 placeholder="Record observations and advice..."
                 required
               ></textarea></label
-            ><button class="primary-button" type="submit">Mark complete <span>↗</span></button>
+            ><button class="primary-button" type="submit" [disabled]="consultationsLoading()">
+              {{ consultationsLoading() ? 'Saving...' : 'Mark complete' }} <span>↗</span>
+            </button>
           </form>
         </section>
         <section class="panel list-panel">
